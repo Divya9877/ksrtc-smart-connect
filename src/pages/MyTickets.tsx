@@ -1,13 +1,16 @@
+
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { ArrowLeft, Ticket, Calendar, MapPin } from "lucide-react";
+import { ArrowLeft, Ticket, Calendar, MapPin, Download } from "lucide-react";
+import QRCode from "qrcode";
+import { useState } from "react";
 
 const MyTickets = () => {
   const navigate = useNavigate();
 
-  const tickets = [
+  const initialTickets = [
     {
       id: "KSRTC123456",
       busNumber: "Express 101",
@@ -29,6 +32,50 @@ const MyTickets = () => {
       status: "Completed",
     },
   ];
+
+  const [tickets, setTickets] = useState(initialTickets);
+
+  const handleDownloadTicket = async (ticket: any) => {
+    const canvas = document.createElement("canvas");
+    canvas.width = 400;
+    canvas.height = 200;
+    const ctx = canvas.getContext("2d");
+
+    if (ctx) {
+      // Background
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, 400, 200);
+
+      // Header
+      ctx.fillStyle = "#000000";
+      ctx.font = "bold 20px Arial";
+      ctx.fillText("Bus Ticket", 150, 30);
+
+      // Ticket Info
+      ctx.font = "16px Arial";
+      ctx.fillText(`Ticket ID: ${ticket.id}`, 20, 70);
+      ctx.fillText(`Bus: ${ticket.busNumber}`, 20, 95);
+      ctx.fillText(`Route: ${ticket.from} to ${ticket.to}`, 20, 120);
+      ctx.fillText(`Date: ${ticket.date} at ${ticket.time}`, 20, 145);
+      ctx.fillText(`Seat: ${ticket.seat}`, 20, 170);
+
+      // QR Code
+      const qrCodeDataUrl = await QRCode.toDataURL(JSON.stringify(ticket));
+      const qrCodeImage = new Image();
+      qrCodeImage.src = qrCodeDataUrl;
+      qrCodeImage.onload = () => {
+        ctx.drawImage(qrCodeImage, 300, 70, 80, 80);
+        const link = document.createElement("a");
+        link.download = `ticket-${ticket.id}.png`;
+        link.href = canvas.toDataURL();
+        link.click();
+      };
+    }
+  };
+
+  const handleCancelTicket = (ticketId: string) => {
+    setTickets(tickets.filter((ticket) => ticket.id !== ticketId));
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5">
@@ -108,14 +155,24 @@ const MyTickets = () => {
                       </div>
                     </div>
 
-                    <div className="flex gap-3">
-                      <Button variant="outline" className="flex-1">
+                    <div className="flex gap-3 mt-4">
+                      <Button variant="outline" className="flex-1" onClick={() => navigate(`/digital-ticket`)}>
                         View Details
                       </Button>
                       {ticket.status === "Upcoming" && (
-                        <Button variant="destructive" className="flex-1">
-                          Cancel Ticket
-                        </Button>
+                        <>
+                          <Button variant="destructive" className="flex-1" onClick={() => handleCancelTicket(ticket.id)}>
+                            Cancel Ticket
+                          </Button>
+                          <Button
+                            variant="outline"
+                            className="flex-1"
+                            onClick={() => handleDownloadTicket(ticket)}
+                          >
+                            <Download className="w-4 h-4 mr-2" />
+                            Download Ticket
+                          </Button>
+                        </>
                       )}
                     </div>
                   </Card>

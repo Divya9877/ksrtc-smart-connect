@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
@@ -25,7 +26,8 @@ const TrackBus = () => {
       busNumber: searchBy === "route" ? searchQuery : "KA-01-AB-1234",
       route: "Bangalore - Mysore",
       status: "Running",
-      eta: "15 minutes",
+      departureTime: "10:00 AM",
+      estimatedArrivalTime: "12:30 PM",
       currentLocation: "Electronic City",
     });
     toast.success("Bus found!");
@@ -107,9 +109,16 @@ const TrackBus = () => {
                   <div className="flex items-center justify-between">
                     <span className="text-muted-foreground flex items-center gap-2">
                       <Clock className="w-4 h-4" />
-                      ETA
+                      Departure Time
                     </span>
-                    <span className="font-semibold text-foreground">{busData.eta}</span>
+                    <span className="font-semibold text-foreground">{busData.departureTime}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground flex items-center gap-2">
+                      <Clock className="w-4 h-4" />
+                      Estimated Arrival Time
+                    </span>
+                    <span className="font-semibold text-foreground">{busData.estimatedArrivalTime}</span>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-muted-foreground flex items-center gap-2">
@@ -124,9 +133,14 @@ const TrackBus = () => {
               <Card className="p-6 bg-muted/50">
                 <div className="aspect-video bg-secondary rounded-lg flex items-center justify-center">
                   <div className="text-center">
-                    <MapPin className="w-12 h-12 text-primary mx-auto mb-2" />
-                    <p className="text-muted-foreground">Live Map View</p>
-                    <p className="text-sm text-muted-foreground">(Map integration)</p>
+                    <iframe
+                      src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3888.035099295537!2d77.61505921479836!3d12.96952499085736!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bae16d34b726c5b%3A0x837073289564491e!2sBangalore%2C%20Karnataka!5e0!3m2!1sen!2sin!4v1627045925345!5m2!1sen!2sin"
+                      width="100%"
+                      height="100%"
+                      style={{ border: 0 }}
+                      allowFullScreen={true}
+                      loading="lazy"
+                    ></iframe>
                   </div>
                 </div>
               </Card>
